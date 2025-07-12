@@ -127,26 +127,73 @@ class PacMan extends Block {
 
     updatePosition() {
         this.checkKeys();
+
         if (this.keysDown.has('ArrowLeft')) {
             canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
-            this.position.x -= 5;
+            this.position.x -= 2.5;
         }
         else if (this.keysDown.has('ArrowRight')) {
             canvas.drawImage(this.imgRight, this.position.x, this.position.y);
-            this.position.x += 5;
+            this.position.x += 2.5;
         }
         else if (this.keysDown.has('ArrowUp')) {
             canvas.drawImage(this.imgUp, this.position.x, this.position.y);
-            this.position.y -= 5;
+            this.position.y -= 2.5;
         }
         else if (this.keysDown.has('ArrowDown')) {
             canvas.drawImage(this.imgDown, this.position.x, this.position.y);
-            this.position.y += 5;
+            this.position.y += 2.5;
         }
         else if (this.lastKey === 'ArrowRight') canvas.drawImage(this.imgRight, this.position.x, this.position.y);
         else if (this.lastKey === 'ArrowLeft') canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
         else if (this.lastKey === 'ArrowUp') canvas.drawImage(this.imgUp, this.position.x, this.position.y);
         else if (this.lastKey === 'ArrowDown') canvas.drawImage(this.imgDown, this.position.x, this.position.y);
+        pacMan.checkCollision();
+        
+        canvas.strokeStyle = "white";
+        canvas.strokeRect(this.position.x, this.position.y, this.width, this.height);
+    }
+
+    checkCollision() {
+        Blocks.forEach(block => {
+            if (
+                pacMan.position.x + pacMan.width > block.position.x
+                && pacMan.position.x < block.position.x + block.width
+                && pacMan.position.y === block.position.y
+                && pacMan.keysDown.has('ArrowRight')
+            ) {
+                pacMan.position.x = block.position.x - block.width;
+                return;
+            }
+            else if (
+                pacMan.position.x < block.position.x + block.width
+                && pacMan.position.x > block.position.x
+                && pacMan.position.y === block.position.y
+                && pacMan.keysDown.has('ArrowLeft')
+            ) {
+                pacMan.position.x = block.position.x + block.width;
+                return;
+            }
+            else if (
+                pacMan.position.y + pacMan.height > block.position.y
+                && pacMan.position.y < block.position.y
+                && pacMan.position.x === block.position.x
+                && pacMan.keysDown.has('ArrowDown')
+            ) {
+                pacMan.position.y = block.position.y - block.height;
+                return;
+            }
+            else if (
+                pacMan.position.y < block.position.y + block.height
+                && pacMan.position.y > block.position.y
+                && pacMan.position.x === block.position.x
+                && pacMan.keysDown.has('ArrowUp')
+            ) {
+                pacMan.position.y = block.position.y + block.height;
+                return;
+            }
+        }
+        )
     }
 
     drawPac(content) {
