@@ -91,6 +91,11 @@ class PacMan extends Block {
     image;
     speed = 5;
     keysDown = new Set();
+    imgRight = document.getElementById('pac-right');
+    imgLeft = document.getElementById('pac-left');
+    imgUp = document.getElementById('pac-up');
+    imgDown = document.getElementById('pac-down');
+    lastKey = 'ArrowRight';
 
     constructor(position) {
         super(position);
@@ -103,8 +108,10 @@ class PacMan extends Block {
                 || e.key === 'ArrowLeft'
                 || e.key === 'ArrowRight'
                 && !this.keysDown.has(e.key)
-            )
+            ) {
                 this.keysDown.add(e.key);
+                this.lastKey = e.key;
+            }
 
         });
 
@@ -120,11 +127,26 @@ class PacMan extends Block {
 
     updatePosition() {
         this.checkKeys();
-        console.log(this.keysDown);
-        if (this.keysDown.has('ArrowLeft')) this.position.x -= 5;
-        else if (this.keysDown.has('ArrowRight')) this.position.x += 5;
-        else if (this.keysDown.has('ArrowUp')) this.position.y -= 5;
-        else if (this.keysDown.has('ArrowDown')) this.position.y += 5;
+        if (this.keysDown.has('ArrowLeft')) {
+            canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
+            this.position.x -= 5;
+        }
+        else if (this.keysDown.has('ArrowRight')) {
+            canvas.drawImage(this.imgRight, this.position.x, this.position.y);
+            this.position.x += 5;
+        }
+        else if (this.keysDown.has('ArrowUp')) {
+            canvas.drawImage(this.imgUp, this.position.x, this.position.y);
+            this.position.y -= 5;
+        }
+        else if (this.keysDown.has('ArrowDown')) {
+            canvas.drawImage(this.imgDown, this.position.x, this.position.y);
+            this.position.y += 5;
+        }
+        else if (this.lastKey === 'ArrowRight') canvas.drawImage(this.imgRight, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowLeft') canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowUp') canvas.drawImage(this.imgUp, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowDown') canvas.drawImage(this.imgDown, this.position.x, this.position.y);
     }
 
     drawPac(content) {
@@ -144,12 +166,10 @@ function drawAnimation() {
     canvas.clearRect(0, 0, c.width, c.height);
     pacMap.drawBlocks();
     pacMan.updatePosition();
-    pacMan.drawPac(canvas);
     requestAnimationFrame(drawAnimation)
 }
 
 
 drawAnimation();
-
 
 
