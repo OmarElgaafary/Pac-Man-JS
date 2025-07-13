@@ -5,10 +5,32 @@ canvas.height = innerHeight;
 canvas.width = innerWidth;
 
 let tileMap = [
-    ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'],
-    ['X', 'P', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X'],
-    ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'],
+    "XXXXXXXXXXXXXXXXXXX",
+    "X        X        X",
+    "X XX XXX X XXX XX X",
+    "X                 X",
+    "X XX X XXXXX X XX X",
+    "X    X       X    X",
+    "XXXX XXXX XXXX XXXX",
+    "OOOX X       X XOOO",
+    "XXXX X XX XX X XXXX",
+    "X                 X",
+    "XXXX X XXXXX X XXXX",
+    "OOOX X       X XOOO",
+    "XXXX X XXXXX X XXXX",
+    "X        X        X",
+    "X XX XXX X XXX XX X",
+    "X  X     P     X  X",
+    "XX X X XXXXX X X XX",
+    "X    X   X   X    X",
+    "X XXXXXX X XXXXXX X",
+    "X                 X",
+    "XXXXXXXXXXXXXXXXXXX"
 ];
+
+tileMap = tileMap.map(substring => substring.split(''));
+
+console.log(tileMap);
 
 let Blocks = [];
 
@@ -36,7 +58,7 @@ class Block {
 };
 
 class PacMap extends Block {
-    blockRow = 3;
+    blockRow = 21;
     blockColumn = 19;
 
     constructor(position) {
@@ -115,7 +137,7 @@ class PacMan {
     findPac() {
         // Finds pac-man's position on the 2D array 'tileMap'
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 21; i++) {
             for (let j = 0; j < 19; j++) {
                 if (tileMap[i][j] === 'P')
                     return [j, i];
@@ -169,21 +191,21 @@ class PacMan {
 
         // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
 
-        if (this.keysDown.has('ArrowLeft')) {
+        if (this.keysDown.has('ArrowLeft') && this.checkLeftPosition()) {
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
-            this.position.x -= 2;
+            this.position.x -= 1;
         }
-        else if (this.keysDown.has('ArrowRight')) {
+        else if (this.keysDown.has('ArrowRight') && this.checkRightPosition()) {
             ctx.drawImage(this.imgRight, this.position.x, this.position.y);
-            this.position.x += 2;
+            this.position.x += 1;
         }
-        else if (this.keysDown.has('ArrowUp')) {
+        else if (this.keysDown.has('ArrowUp') && this.checkUpPosition()) {
             ctx.drawImage(this.imgUp, this.position.x, this.position.y);
-            this.position.y -= 2;
+            this.position.y -= 1;
         }
-        else if (this.keysDown.has('ArrowDown')) {
+        else if (this.keysDown.has('ArrowDown') && this.checkDownPosition()) {
             ctx.drawImage(this.imgDown, this.position.x, this.position.y);
-            this.position.y += 2;
+            this.position.y += 1;
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
 
@@ -199,7 +221,50 @@ class PacMan {
     }
 
     convertPixelToGrid() {
-        return [Math.floor(pacMan.position.y / 32), Math.floor(pacMan.position.x / 32)];
+        return [Math.floor(Math.round(pacMan.position.y / 32)), Math.floor(Math.round(pacMan.position.x / 32))];
+    }
+
+    checkRightPosition() {
+        let nextX = Math.floor(Math.round((pacMan.position.x - 16) / 32)) + 1;
+        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkLeftPosition() {
+        let nextX = Math.floor(Math.round((pacMan.position.x + 16) / 32)) - 1;
+        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+        console.log(tileMap[nextY][nextX], nextX, nextY, pacMan.position);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkUpPosition() {
+        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
+        let nextY = Math.floor(Math.round((pacMan.position.y + 16) / 32)) - 1;
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkDownPosition() {
+        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
+        let nextY = Math.floor(Math.round((pacMan.position.y - 16) / 32)) + 1;
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
     }
 
 };
@@ -218,22 +283,15 @@ let pacMan = new PacMan(
 );
 
 pacMap.createBlocks();
-console.log(Blocks);
+
 function drawAnimationLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     pacMap.drawBlocks();
     pacMan.updatePosition();
-    let [pacY, pacX] = pacMan.convertPixelToGrid();
-    pacMap.locatePacMan(pacY, pacX);
-
-    ctx.fillStyle = 'blue';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(pacMap.printMap(), 500, 500);
-
 
     requestAnimationFrame(drawAnimationLoop);
 }
 
 drawAnimationLoop();
-console.log(pacMan.position);
+console.log(tileMap[1][1]);
 
