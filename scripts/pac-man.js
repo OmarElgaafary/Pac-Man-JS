@@ -274,6 +274,24 @@ class PacMan {
             return false;
     }
 
+    eatPellet() {
+        let pacX = Math.floor(pacMan.position.x / 32);
+        let pacY = Math.floor(pacMan.position.y / 32);
+
+        if (tileMap[pacY][pacX] === ' ') {
+            let pelletFound;
+            for (let i = 0; i < Pellets.length; i++) {
+                const pellet = Pellets[i];
+                if (pellet.position.x === pacX && pellet.position.y === pacY) {
+                    Pellets = Pellets.filter(p => p !== pellet)
+                    console.log('found ya')
+                    tileMap[pacY][pacX] = 'P';
+                    return;
+                }
+            }
+        }
+    }
+
 };
 
 class Pellet {
@@ -290,14 +308,13 @@ class Pellet {
     }
 
     drawPellet(pellet) {
-        ctx.fillStyle = 'white'
-        ctx.fillRect(pellet.position.x + 16, pellet.position.y + 16, 8, 8)
+        ctx.fillStyle = 'white';
+        ctx.fillRect(pellet.position.x * pellet.width + (pellet.width / 2), pellet.position.y * pellet.height + (pellet.height / 2), 6, 6);
     }
 
     drawPellets() {
         Pellets.forEach((pellet) => {
-            ctx.fillStyle = 'white';
-            ctx.fillRect(pellet.position.x * pellet.width + (pellet.width / 2), pellet.position.y * pellet.height + (pellet.height / 2), 6, 6);
+            this.drawPellet(pellet);
         });
     }
 };
@@ -320,17 +337,17 @@ let pacPellets = new Pellet({
     y: 1
 });
 
-console.log(Pellets);
 
 function drawAnimationLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     pacMap.drawBlocks();
     pacPellets.drawPellets();
     pacMan.updatePosition();
+    pacMan.eatPellet();
 
     requestAnimationFrame(drawAnimationLoop);
 }
+console.log(Pellets[1]);
 
 drawAnimationLoop();
-console.log(tileMap[1][1]);
 
