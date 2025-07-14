@@ -1,15 +1,10 @@
-import * as block from './block.js';
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
 
-const c = document.querySelector('canvas');
-const canvas = c.getContext('2d');
-// canvas dimensions & graphics
-c.width = innerWidth;
-c.height = innerHeight;
+canvas.height = innerHeight;
+canvas.width = innerWidth;
 
-
-// title map 21 rows by 19 columns
-
-const tileMap = [
+let tileMap = [
     "XXXXXXXXXXXXXXXXXXX",
     "X        X        X",
     "X XX XXX X XXX XX X",
@@ -18,8 +13,8 @@ const tileMap = [
     "X    X       X    X",
     "XXXX XXXX XXXX XXXX",
     "OOOX X       X XOOO",
-    "XXXX X XXrXX X XXXX",
-    "O       bpo       O",
+    "XXXX X XX XX X XXXX",
+    "X                 X",
     "XXXX X XXXXX X XXXX",
     "OOOX X       X XOOO",
     "XXXX X XXXXX X XXXX",
@@ -33,42 +28,53 @@ const tileMap = [
     "XXXXXXXXXXXXXXXXXXX"
 ];
 
+tileMap = tileMap.map(substring => substring.split(''));
+
+console.log(tileMap);
+
 let Blocks = [];
+let Pellets = [];
 
 class Block {
-    position;
     width = 32;
     height = 32;
+    position;
 
     constructor(position) {
+        // Constructor initalizes block coordinates
+
         this.position =
         {
-            x: position.x * this.width,
-            y: position.y * this.height
+            x: position.x,
+            y: position.y
         };
     }
 
-    drawBlock(content) {
-        content.fillStyle = "blue";
-        content.fillRect(this.position.x, this.position.y, this.width, this.height);
+    drawBlock() {
+        // Fn draws individual block on HTML canvas
+
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(this.position.x * this.width, this.position.y * this.height, this.width, this.height);
     }
 };
 
-
-class Map {
+class PacMap extends Block {
     blockRow = 21;
     blockColumn = 19;
 
-    initalizeBlocks() {
-        console.log('running');
+    constructor(position) {
+        super(position);
+        this.createBlocks();
+        this.createPellets();
+    }
 
-        for (let i = 0; i < tileMap.length; i++) {
-            const currentString = tileMap[i];
-            for (let j = 0; j < currentString.length; j++) {
-                const currentChar = currentString[j];
+    createBlocks() {
+        // Creates map boundries in the form of 'Blocks' by finding corresponding 'X' position representing map Block.
+        // Fn then pushes the found Block to an array of map blocks (Blocks); 
 
-                if (currentChar === 'X') {
-
+        for (let i = 0; i < this.blockRow; i++) {
+            for (let j = 0; j < this.blockColumn; j++) {
+                if (tileMap[i][j] === 'X') {
                     Blocks.push(new Block({
                         x: j,
                         y: i
@@ -76,32 +82,85 @@ class Map {
                 }
             }
         }
+    }
 
+    createPellets() {
+        // Creates pellets of class 'Pellet' for every ' ' found in the tileMap 2D array and stores it in Pellets array
+
+        for (let i = 0; i < this.blockRow; i++) {
+            for (let j = 0; j < this.blockColumn; j++) {
+                if (tileMap[i][j] === ' ') {
+                    Pellets.push(new Pellet({
+                        x: j,
+                        y: i
+                    }));
+                }
+            }
+        }
     }
 
     drawBlocks() {
-        Blocks.forEach((Block) => {
-            Block.drawBlock(canvas);
-        });
+        // Draws each block present in the tileMap on to the HTML canvas
+
+        Blocks.forEach(block => {
+            block.drawBlock();
+        }
+        );
+    }
+
+    locatePacMan(pacY, pacX) {
+        // calls pixelToGird() fn and finds pac-man position
+        if (tileMap[pacY][pacX] === ' ') {
+            tileMap[pacY][pacX] = 'P';
+        }
+
+        console.log(tileMap[pacY][pacX])
     }
 
 };
 
-class PacMan extends Block {
-    image;
-    speed = 5;
+class PacMan {
+    width = 32;
+    height = 32;
+    position = {};
+
     keysDown = new Set();
+
     imgRight = document.getElementById('pac-right');
     imgLeft = document.getElementById('pac-left');
     imgUp = document.getElementById('pac-up');
     imgDown = document.getElementById('pac-down');
+
     lastKey = 'ArrowRight';
 
-    constructor(position) {
-        super(position);
+    constructor() {
+        // Constructor finds coordinates of pac-man using findPac() fn and initalizes pac-man's position
+
+        let [x, y] = this.findPac();
+        this.position.x = x * this.width;
+        this.position.y = y * this.height;
+    }
+
+    findPac() {
+        // Finds pac-man's position on the 2D array 'tileMap'
+
+        for (let i = 0; i < 21; i++) {
+            for (let j = 0; j < 19; j++) {
+                if (tileMap[i][j] === 'P')
+                    return [j, i];
+            }
+        }
+        return [-1, -1];
+    }
+
+    drawPac() {
+        // Draws pac-man
+        ctx.drawImage(this.imgRight, this.position.x, this.position.y);
     }
 
     checkKeys() {
+        // Event listeners for key down, if an arrow key is held down it psuhes it to a set of active keys
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowUp'
                 || e.key === 'ArrowDown'
@@ -115,108 +174,163 @@ class PacMan extends Block {
 
         });
 
+        // If one of the active keys is released, it will be deleted from the set of active keys
+
         window.addEventListener('keyup', (e) => {
             if (e.key === 'ArrowRight'
                 || e.key === 'ArrowLeft'
                 || e.key === 'ArrowUp'
-                || e.key === 'ArrowDown')
+                || e.key === 'ArrowDown'
+                && this.keysDown.has(e.key)
+            )
                 this.keysDown.delete(e.key)
 
         });
     }
 
     updatePosition() {
+        // Fn updates pac-man's position
+
+
+        // calls checkKeys() to update active keys
+
         this.checkKeys();
 
-        if (this.keysDown.has('ArrowLeft')) {
-            canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
-            this.position.x -= 2.5;
+        // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
+
+        if (this.keysDown.has('ArrowLeft') && this.checkLeftPosition()) {
+            ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
+            this.position.x -= 1;
         }
-        else if (this.keysDown.has('ArrowRight')) {
-            canvas.drawImage(this.imgRight, this.position.x, this.position.y);
-            this.position.x += 2.5;
+        else if (this.keysDown.has('ArrowRight') && this.checkRightPosition()) {
+            ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+            this.position.x += 1;
         }
-        else if (this.keysDown.has('ArrowUp')) {
-            canvas.drawImage(this.imgUp, this.position.x, this.position.y);
-            this.position.y -= 2.5;
+        else if (this.keysDown.has('ArrowUp') && this.checkUpPosition()) {
+            ctx.drawImage(this.imgUp, this.position.x, this.position.y);
+            this.position.y -= 1;
         }
-        else if (this.keysDown.has('ArrowDown')) {
-            canvas.drawImage(this.imgDown, this.position.x, this.position.y);
-            this.position.y += 2.5;
+        else if (this.keysDown.has('ArrowDown') && this.checkDownPosition()) {
+            ctx.drawImage(this.imgDown, this.position.x, this.position.y);
+            this.position.y += 1;
         }
-        else if (this.lastKey === 'ArrowRight') canvas.drawImage(this.imgRight, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowLeft') canvas.drawImage(this.imgLeft, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowUp') canvas.drawImage(this.imgUp, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowDown') canvas.drawImage(this.imgDown, this.position.x, this.position.y);
-        pacMan.checkCollision();
-        
-        canvas.strokeStyle = "white";
-        canvas.strokeRect(this.position.x, this.position.y, this.width, this.height);
+        // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
+
+        else if (this.lastKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
+        else if (this.lastKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
+
+        // Gray pac-man hitbox
+
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(this.position.x * this.width, this.position.y * this.height, this.width, this.height);
     }
 
-    checkCollision() {
-        Blocks.forEach(block => {
-            if (
-                pacMan.position.x + pacMan.width > block.position.x
-                && pacMan.position.x < block.position.x + block.width
-                && pacMan.position.y === block.position.y
-                && pacMan.keysDown.has('ArrowRight')
-            ) {
-                pacMan.position.x = block.position.x - block.width;
-                return;
-            }
-            else if (
-                pacMan.position.x < block.position.x + block.width
-                && pacMan.position.x > block.position.x
-                && pacMan.position.y === block.position.y
-                && pacMan.keysDown.has('ArrowLeft')
-            ) {
-                pacMan.position.x = block.position.x + block.width;
-                return;
-            }
-            else if (
-                pacMan.position.y + pacMan.height > block.position.y
-                && pacMan.position.y < block.position.y
-                && pacMan.position.x === block.position.x
-                && pacMan.keysDown.has('ArrowDown')
-            ) {
-                pacMan.position.y = block.position.y - block.height;
-                return;
-            }
-            else if (
-                pacMan.position.y < block.position.y + block.height
-                && pacMan.position.y > block.position.y
-                && pacMan.position.x === block.position.x
-                && pacMan.keysDown.has('ArrowUp')
-            ) {
-                pacMan.position.y = block.position.y + block.height;
-                return;
-            }
-        }
-        )
+    convertPixelToGrid() {
+        return [Math.floor(Math.round(pacMan.position.y / 32)), Math.floor(Math.round(pacMan.position.x / 32))];
     }
 
-    drawPac(content) {
-        content.fillStyle = "yellow";
-        content.fillRect(this.position.x, this.position.y, this.width, this.height);
+    checkRightPosition() {
+        let nextX = Math.floor(Math.round((pacMan.position.x - 16) / 32)) + 1;
+        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkLeftPosition() {
+        let nextX = Math.floor(Math.round((pacMan.position.x + 16) / 32)) - 1;
+        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+        console.log(tileMap[nextY][nextX], nextX, nextY, pacMan.position);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkUpPosition() {
+        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
+        let nextY = Math.floor(Math.round((pacMan.position.y + 16) / 32)) - 1;
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+    checkDownPosition() {
+        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
+        let nextY = Math.floor(Math.round((pacMan.position.y - 16) / 32)) + 1;
+
+        console.log(tileMap[nextY][nextX]);
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+            return true;
+        else
+            return false;
+    }
+
+};
+
+class Pellet {
+    height = 32;
+    width = 32;
+    position;
+
+
+    constructor(position) {
+        this.position = {
+            x: position.x,
+            y: position.y
+        }
+    }
+
+    drawPellet(pellet) {
+        ctx.fillStyle = 'white'
+        ctx.fillRect(pellet.position.x + 16, pellet.position.y + 16, 8, 8)
+    }
+
+    drawPellets() {
+        Pellets.forEach((pellet) => {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(pellet.position.x * pellet.width + (pellet.width / 2), pellet.position.y * pellet.height + (pellet.height / 2), 6, 6);
+        });
     }
 };
 
-let pacMap = new Map();
-let pacMan = new PacMan({
+
+let pacMap = new PacMap({
+    x: 0,
+    y: 0
+});
+
+let pacMan = new PacMan(
+    {
+        x: 1,
+        y: 1
+    }
+);
+
+let pacPellets = new Pellet({
     x: 1,
     y: 1
 });
-pacMap.initalizeBlocks();
 
-function drawAnimation() {
-    canvas.clearRect(0, 0, c.width, c.height);
+console.log(Pellets);
+
+function drawAnimationLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     pacMap.drawBlocks();
+    pacPellets.drawPellets();
     pacMan.updatePosition();
-    requestAnimationFrame(drawAnimation)
+
+    requestAnimationFrame(drawAnimationLoop);
 }
 
-
-drawAnimation();
-
+drawAnimationLoop();
+console.log(tileMap[1][1]);
 
