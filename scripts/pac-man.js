@@ -28,9 +28,9 @@ let tileMap = [
     "XXXXXXXXXXXXXXXXXXX"
 ];
 
-tileMap = tileMap.map(substring => substring.split(''));
+let gameScore = 0;
 
-console.log(tileMap);
+tileMap = tileMap.map(substring => substring.split(''));
 
 let Blocks = [];
 let Pellets = [];
@@ -114,7 +114,6 @@ class PacMap extends Block {
             tileMap[pacY][pacX] = 'P';
         }
 
-        console.log(tileMap[pacY][pacX])
     }
 
 };
@@ -235,7 +234,6 @@ class PacMan {
         let nextX = Math.floor(Math.round((pacMan.position.x - 16) / 32)) + 1;
         let nextY = Math.floor(Math.round(pacMan.position.y / 32));
 
-        console.log(tileMap[nextY][nextX]);
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -245,7 +243,6 @@ class PacMan {
     checkLeftPosition() {
         let nextX = Math.floor(Math.round((pacMan.position.x + 16) / 32)) - 1;
         let nextY = Math.floor(Math.round(pacMan.position.y / 32));
-        console.log(tileMap[nextY][nextX], nextX, nextY, pacMan.position);
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -256,7 +253,6 @@ class PacMan {
         let nextX = Math.floor(Math.round(pacMan.position.x / 32));
         let nextY = Math.floor(Math.round((pacMan.position.y + 16) / 32)) - 1;
 
-        console.log(tileMap[nextY][nextX]);
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -267,7 +263,6 @@ class PacMan {
         let nextX = Math.floor(Math.round(pacMan.position.x / 32));
         let nextY = Math.floor(Math.round((pacMan.position.y - 16) / 32)) + 1;
 
-        console.log(tileMap[nextY][nextX]);
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -284,8 +279,8 @@ class PacMan {
                 const pellet = Pellets[i];
                 if (pellet.position.x === pacX && pellet.position.y === pacY) {
                     Pellets = Pellets.filter(p => p !== pellet)
-                    console.log('found ya')
                     tileMap[pacY][pacX] = 'P';
+                    gameScore += 5;
                     return;
                 }
             }
@@ -345,9 +340,11 @@ function drawAnimationLoop() {
     pacMan.updatePosition();
     pacMan.eatPellet();
 
+    ctx.fillStyle = 'white';
+    ctx.fillText(`Score: ${gameScore}`, 700, 100);
+
     requestAnimationFrame(drawAnimationLoop);
 }
-console.log(Pellets[1]);
 
 drawAnimationLoop();
 
