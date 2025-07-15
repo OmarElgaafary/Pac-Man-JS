@@ -129,6 +129,7 @@ class PacMan {
     imgLeft = document.getElementById('pac-left');
     imgUp = document.getElementById('pac-up');
     imgDown = document.getElementById('pac-down');
+    redDot = document.getElementById('red-dot');
 
     lastKey = 'ArrowRight';
 
@@ -198,20 +199,20 @@ class PacMan {
         // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
 
         if (this.keysDown.has('ArrowLeft') && this.checkLeftPosition()) {
-            ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
             this.position.x -= 1;
+            ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowRight') && this.checkRightPosition()) {
-            ctx.drawImage(this.imgRight, this.position.x, this.position.y);
             this.position.x += 1;
+            ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowUp') && this.checkUpPosition()) {
-            ctx.drawImage(this.imgUp, this.position.x, this.position.y);
             this.position.y -= 1;
+            ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowDown') && this.checkDownPosition()) {
-            ctx.drawImage(this.imgDown, this.position.x, this.position.y);
             this.position.y += 1;
+            ctx.drawImage(this.imgDown, this.position.x, this.position.y);
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
 
@@ -227,12 +228,14 @@ class PacMan {
     }
 
     convertPixelToGrid() {
-        return [Math.floor(Math.round(pacMan.position.y / 32)), Math.floor(Math.round(pacMan.position.x / 32))];
+        return [Math.floor(pacMan.position.y / 32), Math.floor(pacMan.position.x / 32)];
     }
 
     checkRightPosition() {
-        let nextX = Math.floor(Math.round((pacMan.position.x - 16) / 32)) + 1;
-        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+        if (Math.floor(pacMan.position.x / 32) * 32 !== pacMan.position.x) return true;
+        let nextX = Math.floor(pacMan.position.x / 32) + 1;
+        let nextY = Math.floor((pacMan.position.y / 32));
+        console.log(nextX, nextY, pacMan.position.x, pacMan.position.y)
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
@@ -241,8 +244,10 @@ class PacMan {
     }
 
     checkLeftPosition() {
-        let nextX = Math.floor(Math.round((pacMan.position.x + 16) / 32)) - 1;
+        if (Math.floor(pacMan.position.x / 32) * 32 !== pacMan.position.x) return true;
+        let nextX = Math.floor(Math.round(pacMan.position.x / 32)) - 1;
         let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+        console.log(nextX, nextY, pacMan.position.x, pacMan.position.y)
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -250,8 +255,9 @@ class PacMan {
     }
 
     checkUpPosition() {
-        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
-        let nextY = Math.floor(Math.round((pacMan.position.y + 16) / 32)) - 1;
+        if (Math.floor(pacMan.position.y / 32) * 32 !== pacMan.position.y) return true;
+        let nextX = Math.floor((pacMan.position.x / 32));
+        let nextY = Math.floor((pacMan.position.y / 32)) - 1;
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
@@ -260,8 +266,9 @@ class PacMan {
     }
 
     checkDownPosition() {
-        let nextX = Math.floor(Math.round(pacMan.position.x / 32));
-        let nextY = Math.floor(Math.round((pacMan.position.y - 16) / 32)) + 1;
+        if (Math.floor(pacMan.position.y / 32) * 32 !== pacMan.position.y) return true;
+        let nextX = Math.floor((pacMan.position.x / 32));
+        let nextY = Math.floor((pacMan.position.y / 32)) + 1;
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
