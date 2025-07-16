@@ -199,19 +199,19 @@ class PacMan {
         // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
 
         if (this.keysDown.has('ArrowLeft') && this.checkLeftPosition()) {
-            this.position.x -= 1;
+            this.position.x -= 2;
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowRight') && this.checkRightPosition()) {
-            this.position.x += 1;
+            this.position.x += 2;
             ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowUp') && this.checkUpPosition()) {
-            this.position.y -= 1;
+            this.position.y -= 2;
             ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
         else if (this.keysDown.has('ArrowDown') && this.checkDownPosition()) {
-            this.position.y += 1;
+            this.position.y += 2;
             ctx.drawImage(this.imgDown, this.position.x, this.position.y);
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
@@ -232,10 +232,12 @@ class PacMan {
     }
 
     checkRightPosition() {
-        if (Math.floor(pacMan.position.x / 32) * 32 !== pacMan.position.x) return true;
         let nextX = Math.floor(pacMan.position.x / 32) + 1;
-        let nextY = Math.floor((pacMan.position.y / 32));
-        console.log(nextX, nextY, pacMan.position.x, pacMan.position.y)
+        let nextY = Math.floor(pacMan.position.y / 32);
+        console.log(Math.floor((pacMan.position.x / 32)) * 32 , nextX, pacMan.position.x)
+
+        if ((nextX * 32) !== pacMan.position.x + pacMan.width)
+            return true;
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
@@ -244,10 +246,13 @@ class PacMan {
     }
 
     checkLeftPosition() {
-        if (Math.floor(pacMan.position.x / 32) * 32 !== pacMan.position.x) return true;
         let nextX = Math.floor(Math.round(pacMan.position.x / 32)) - 1;
         let nextY = Math.floor(Math.round(pacMan.position.y / 32));
         console.log(nextX, nextY, pacMan.position.x, pacMan.position.y)
+
+        if ((nextX * 32 + pacMan.width) !== pacMan.position.x)
+            return true;
+
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
@@ -255,9 +260,11 @@ class PacMan {
     }
 
     checkUpPosition() {
-        if (Math.floor(pacMan.position.y / 32) * 32 !== pacMan.position.y) return true;
         let nextX = Math.floor((pacMan.position.x / 32));
         let nextY = Math.floor((pacMan.position.y / 32)) - 1;
+
+        if ((nextY * 32 + pacMan.height) !== pacMan.position.y)
+            return true;
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
@@ -266,9 +273,11 @@ class PacMan {
     }
 
     checkDownPosition() {
-        if (Math.floor(pacMan.position.y / 32) * 32 !== pacMan.position.y) return true;
-        let nextX = Math.floor((pacMan.position.x / 32));
-        let nextY = Math.floor((pacMan.position.y / 32)) + 1;
+        let nextX = Math.floor(pacMan.position.x / 32);
+        let nextY = Math.floor(pacMan.position.y / 32) + 1;
+
+        if ((nextY * 32) !== pacMan.position.y + pacMan.height)
+            return true;
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
