@@ -198,17 +198,21 @@ class PacMan {
 
         if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition()) {
             this.position.x -= 2;
+            pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowRight' && this.checkRightPosition()) {
             this.position.x += 2;
+            pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
             ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowUp' && this.checkUpPosition()) {
             this.position.y -= 2;
+            pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
             ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowDown' && this.checkDownPosition()) {
+            pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
             this.position.y += 2;
             ctx.drawImage(this.imgDown, this.position.x, this.position.y);
         }
@@ -233,22 +237,22 @@ class PacMan {
     checkRightPosition() {
         let nextX = Math.floor(pacMan.position.x / 32) + 1;
         let nextY = Math.floor(pacMan.position.y / 32);
+        console.log(pacMan.position.x, nextX)
 
-        if ((nextX * 32) !== pacMan.position.x + pacMan.width)
-            return true;
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
     }
 
     checkLeftPosition() {
-        let nextX = Math.floor(Math.round(pacMan.position.x / 32)) - 1;
-        let nextY = Math.floor(Math.round(pacMan.position.y / 32));
+        let nextX = Math.floor((pacMan.position.x + pacMan.width - 1) / 32) - 1;
+        let nextY = Math.floor(pacMan.position.y / 32);
 
-        if ((nextX * 32 + pacMan.width) !== pacMan.position.x)
-            return true;
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        console.log(pacMan.position.x, nextX)
+
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -270,9 +274,8 @@ class PacMan {
         let nextX = Math.floor(pacMan.position.x / 32);
         let nextY = Math.floor(pacMan.position.y / 32) + 1;
 
-        if ((nextY * 32) !== pacMan.position.y + pacMan.height)
-            return true;
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -285,11 +288,11 @@ class PacMan {
             return;
         }
 
+
         if ((this.queuedKey === 'ArrowRight' && this.checkRightPosition())
             || (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition())
             || (this.queuedKey === 'ArrowUp' && this.checkUpPosition())
-            || (this.queuedKey === 'ArrowDown' && this.checkDownPosition()))
-        {
+            || (this.queuedKey === 'ArrowDown' && this.checkDownPosition())) {
             this.currentKey = this.queuedKey;
             this.queuedKey = null
             return;
