@@ -1,5 +1,6 @@
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
+import { Block } from "./block.js";
+export const canvas = document.querySelector('canvas');
+export const ctx = canvas.getContext('2d');
 
 canvas.height = innerHeight;
 canvas.width = innerWidth;
@@ -34,29 +35,6 @@ tileMap = tileMap.map(substring => substring.split(''));
 
 let Blocks = [];
 let Pellets = [];
-
-class Block {
-    width = 32;
-    height = 32;
-    position;
-
-    constructor(position) {
-        // Constructor initalizes block coordinates
-
-        this.position =
-        {
-            x: position.x,
-            y: position.y
-        };
-    }
-
-    drawBlock() {
-        // Fn draws individual block on HTML canvas
-
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(this.position.x * this.width, this.position.y * this.height, this.width, this.height);
-    }
-};
 
 class PacMap extends Block {
     blockRow = 21;
