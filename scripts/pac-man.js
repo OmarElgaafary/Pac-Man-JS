@@ -176,44 +176,27 @@ class PacMan {
                 }
                 else {
                     this.queuedKey = e.key;
-                    console.log('sound')
                 }
-
-
-                this.keysDown.add(e.key);
-                this.lastKey = e.key;
             }
-
-        });
-
-        // If one of the active keys is released, it will be deleted from the set of active keys
-
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowRight'
-                || e.key === 'ArrowLeft'
-                || e.key === 'ArrowUp'
-                || e.key === 'ArrowDown'
-            )
-                this.keysDown.delete(e.key)
 
         });
     }
 
     updatePosition() {
-        // Fn updates pac-man's position
-
 
         // calls checkKeys() to update active keys
 
         this.checkKeys();
 
+        // checkQueuedPositions() goes through all 4 directions and determines if a queued direction's next block is available and reasigns current key if available
+
         this.checkQueuedPositions();
 
 
 
-        // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
+        // Whichever direction is currently assigned to the 'currentKey' variable is used to move pac-man a distance 2.5px in the corresponding direction
+
         if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition()) {
-            console.log(this.currentKey)
             this.position.x -= 2;
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
@@ -243,6 +226,7 @@ class PacMan {
     }
 
     convertPixelToGrid() {
+        // converts pacman's position in pixels to his [i, j] position's on the 'tileMap' grid
         return [Math.floor(pacMan.position.y / 32), Math.floor(pacMan.position.x / 32)];
     }
 
@@ -252,8 +236,7 @@ class PacMan {
 
         if ((nextX * 32) !== pacMan.position.x + pacMan.width)
             return true;
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -265,8 +248,7 @@ class PacMan {
 
         if ((nextX * 32 + pacMan.width) !== pacMan.position.x)
             return true;
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -278,8 +260,7 @@ class PacMan {
 
         if ((nextY * 32 + pacMan.height) !== pacMan.position.y)
             return true;
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -291,8 +272,7 @@ class PacMan {
 
         if ((nextY * 32) !== pacMan.position.y + pacMan.height)
             return true;
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -305,34 +285,16 @@ class PacMan {
             return;
         }
 
-        console.log(this.currentKey, this.queuedKey);
-
-        if (this.queuedKey === 'ArrowRight' && this.checkRightPosition()) {
-
+        if ((this.queuedKey === 'ArrowRight' && this.checkRightPosition())
+            || (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition())
+            || (this.queuedKey === 'ArrowUp' && this.checkUpPosition())
+            || (this.queuedKey === 'ArrowDown' && this.checkDownPosition()))
+        {
             this.currentKey = this.queuedKey;
             this.queuedKey = null
             return;
 
         }
-        else if (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition()) {
-            this.currentKey = this.queuedKey;
-            this.queuedKey = null;
-            return;
-        }
-        else if (this.queuedKey === 'ArrowUp' && this.checkUpPosition()) {
-            this.currentKey = this.queuedKey;
-            this.queuedKey = null;
-            return;
-        }
-        else if (this.queuedKey === 'ArrowDown' && this.checkDownPosition()) {
-            this.currentKey = this.queuedKey;
-            this.queuedKey = null;
-            return;
-        }
-
-
-        console.log(this.currentKey, this.queuedKey);
-
     }
 
     eatPellet() {
