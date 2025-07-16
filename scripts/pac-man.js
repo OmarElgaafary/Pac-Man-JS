@@ -125,6 +125,9 @@ class PacMan {
 
     keysDown = new Set();
 
+    currentKey = '';
+    queuedKey = '';
+
     imgRight = document.getElementById('pac-right');
     imgLeft = document.getElementById('pac-left');
     imgUp = document.getElementById('pac-up');
@@ -166,8 +169,17 @@ class PacMan {
                 || e.key === 'ArrowDown'
                 || e.key === 'ArrowLeft'
                 || e.key === 'ArrowRight'
-                && !this.keysDown.has(e.key)
             ) {
+
+                if (this.currentKey === '') {
+                    this.currentKey = e.key;
+                }
+                else {
+                    this.queuedKey = e.key;
+                    console.log('sound')
+                }
+
+
                 this.keysDown.add(e.key);
                 this.lastKey = e.key;
             }
@@ -181,7 +193,6 @@ class PacMan {
                 || e.key === 'ArrowLeft'
                 || e.key === 'ArrowUp'
                 || e.key === 'ArrowDown'
-                && this.keysDown.has(e.key)
             )
                 this.keysDown.delete(e.key)
 
@@ -196,30 +207,34 @@ class PacMan {
 
         this.checkKeys();
 
-        // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
+        this.checkQueuedPositions();
 
-        if (this.keysDown.has('ArrowLeft') && this.checkLeftPosition()) {
+
+
+        // Whichever arrow key is held down is used to move pac-man a distance 2.5px in the corresponding direction
+        if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition()) {
+            console.log(this.currentKey)
             this.position.x -= 2;
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
-        else if (this.keysDown.has('ArrowRight') && this.checkRightPosition()) {
+        else if (this.currentKey === 'ArrowRight' && this.checkRightPosition()) {
             this.position.x += 2;
             ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
-        else if (this.keysDown.has('ArrowUp') && this.checkUpPosition()) {
+        else if (this.currentKey === 'ArrowUp' && this.checkUpPosition()) {
             this.position.y -= 2;
             ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
-        else if (this.keysDown.has('ArrowDown') && this.checkDownPosition()) {
+        else if (this.currentKey === 'ArrowDown' && this.checkDownPosition()) {
             this.position.y += 2;
             ctx.drawImage(this.imgDown, this.position.x, this.position.y);
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
 
-        else if (this.lastKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
-        else if (this.lastKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
+        if (this.currentKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
 
         // Gray pac-man hitbox
 
@@ -234,7 +249,6 @@ class PacMan {
     checkRightPosition() {
         let nextX = Math.floor(pacMan.position.x / 32) + 1;
         let nextY = Math.floor(pacMan.position.y / 32);
-        console.log(Math.floor((pacMan.position.x / 32)) * 32 , nextX, pacMan.position.x)
 
         if ((nextX * 32) !== pacMan.position.x + pacMan.width)
             return true;
@@ -248,7 +262,6 @@ class PacMan {
     checkLeftPosition() {
         let nextX = Math.floor(Math.round(pacMan.position.x / 32)) - 1;
         let nextY = Math.floor(Math.round(pacMan.position.y / 32));
-        console.log(nextX, nextY, pacMan.position.x, pacMan.position.y)
 
         if ((nextX * 32 + pacMan.width) !== pacMan.position.x)
             return true;
@@ -283,6 +296,43 @@ class PacMan {
             return true;
         else
             return false;
+    }
+
+    checkQueuedPositions() {
+
+        if (this.currentKey === this.queuedKey) {
+            this.queuedKey = null;
+            return;
+        }
+
+        console.log(this.currentKey, this.queuedKey);
+
+        if (this.queuedKey === 'ArrowRight' && this.checkRightPosition()) {
+
+            this.currentKey = this.queuedKey;
+            this.queuedKey = null
+            return;
+
+        }
+        else if (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition()) {
+            this.currentKey = this.queuedKey;
+            this.queuedKey = null;
+            return;
+        }
+        else if (this.queuedKey === 'ArrowUp' && this.checkUpPosition()) {
+            this.currentKey = this.queuedKey;
+            this.queuedKey = null;
+            return;
+        }
+        else if (this.queuedKey === 'ArrowDown' && this.checkDownPosition()) {
+            this.currentKey = this.queuedKey;
+            this.queuedKey = null;
+            return;
+        }
+
+
+        console.log(this.currentKey, this.queuedKey);
+
     }
 
     eatPellet() {
