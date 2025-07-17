@@ -1,11 +1,17 @@
 import { Block } from "./block.js";
+import { PacMap } from "./pac-map.js";
+import { Pellet } from "./pellet.js";
+
 export const canvas = document.querySelector('canvas');
 export const ctx = canvas.getContext('2d');
+
+export let Blocks = [];
+export let Pellets = [];
 
 canvas.height = innerHeight;
 canvas.width = innerWidth;
 
-let tileMap = [
+export let tileMap = [
     "XXXXXXXXXXXXXXXXXXX",
     "X        X        X",
     "X XX XXX X XXX XX X",
@@ -33,68 +39,6 @@ let gameScore = 0;
 
 tileMap = tileMap.map(substring => substring.split(''));
 
-let Blocks = [];
-let Pellets = [];
-
-class PacMap extends Block {
-    blockRow = 21;
-    blockColumn = 19;
-
-    constructor(position) {
-        super(position);
-        this.createBlocks();
-        this.createPellets();
-    }
-
-    createBlocks() {
-        // Creates map boundries in the form of 'Blocks' by finding corresponding 'X' position representing map Block.
-        // Fn then pushes the found Block to an array of map blocks (Blocks); 
-
-        for (let i = 0; i < this.blockRow; i++) {
-            for (let j = 0; j < this.blockColumn; j++) {
-                if (tileMap[i][j] === 'X') {
-                    Blocks.push(new Block({
-                        x: j,
-                        y: i
-                    }));
-                }
-            }
-        }
-    }
-
-    createPellets() {
-        // Creates pellets of class 'Pellet' for every ' ' found in the tileMap 2D array and stores it in Pellets array
-
-        for (let i = 0; i < this.blockRow; i++) {
-            for (let j = 0; j < this.blockColumn; j++) {
-                if (tileMap[i][j] === ' ') {
-                    Pellets.push(new Pellet({
-                        x: j,
-                        y: i
-                    }));
-                }
-            }
-        }
-    }
-
-    drawBlocks() {
-        // Draws each block present in the tileMap on to the HTML canvas
-
-        Blocks.forEach(block => {
-            block.drawBlock();
-        }
-        );
-    }
-
-    locatePacMan(pacY, pacX) {
-        // calls pixelToGird() fn and finds pac-man position
-        if (tileMap[pacY][pacX] === ' ') {
-            tileMap[pacY][pacX] = 'P';
-        }
-
-    }
-
-};
 
 class PacMan {
     width = 32;
@@ -334,31 +278,6 @@ class PacMan {
         }
     }
 
-};
-
-class Pellet {
-    height = 32;
-    width = 32;
-    position;
-
-
-    constructor(position) {
-        this.position = {
-            x: position.x,
-            y: position.y
-        }
-    }
-
-    drawPellet(pellet) {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(pellet.position.x * pellet.width + (pellet.width / 2), pellet.position.y * pellet.height + (pellet.height / 2), 6, 6);
-    }
-
-    drawPellets() {
-        Pellets.forEach((pellet) => {
-            this.drawPellet(pellet);
-        });
-    }
 };
 
 
