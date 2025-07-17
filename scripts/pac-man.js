@@ -217,8 +217,10 @@ class PacMan {
         let nextY = Math.floor(pacMan.position.y / 32);
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
+            this.eatPellet(nextY, nextX);
             return true;
+        }
         else
             return false;
     }
@@ -229,10 +231,15 @@ class PacMan {
 
         // addition logic for starting x value
 
-        if ((nextX * 32 + pacMan.width !== pacMan.position.x))
+        if ((nextX * 32 + pacMan.width !== pacMan.position.x)) {
+            this.eatPellet(nextY, nextX);
             return true;
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        }
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
+            this.eatPellet(nextY, nextX);
             return true;
+
+        }
         else
             return false;
     }
@@ -243,10 +250,14 @@ class PacMan {
 
         // addition logic for starting y value
 
-        if ((nextY * 32 + pacMan.height) !== pacMan.position.y)
+        if ((nextY * 32 + pacMan.height) !== pacMan.position.y) {
+            this.eatPellet(nextY, nextX);
             return true;
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        }
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
+            this.eatPellet(nextY, nextX);
             return true;
+        }
         else
             return false;
     }
@@ -256,8 +267,11 @@ class PacMan {
         let nextY = Math.floor(pacMan.position.y / 32) + 1;
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
+            this.eatPellet(nextY, nextX);
             return true;
+
+        }
         else
             return false;
     }
@@ -281,20 +295,41 @@ class PacMan {
         }
     }
 
-    eatPellet() {
-        let pacX = Math.floor(pacMan.position.x / 32);
-        let pacY = Math.floor(pacMan.position.y / 32);
+    eatPellet(pacY, pacX) {
 
-        if (tileMap[pacY][pacX] === ' ') {
-            let pelletFound;
-            for (let i = 0; i < Pellets.length; i++) {
-                const pellet = Pellets[i];
-                if (pellet.position.x === pacX && pellet.position.y === pacY) {
-                    Pellets = Pellets.filter(p => p !== pellet)
-                    tileMap[pacY][pacX] = 'P';
-                    gameScore += 5;
-                    return;
+        let pelletFound;
+        for (let i = 0; i < Pellets.length; i++) {
+            const pellet = Pellets[i];
+            if (pellet.position.x === pacX && pellet.position.y === pacY) {
+                Pellets = Pellets.filter(p => p !== pellet)
+                gameScore += 5;
+                return;
+            }
+        }
+
+    }
+
+    drawRed() {
+        for (let i = 0; i < 21; i++) {
+            for (let j = 0; j < 19; j++) {
+                if (tileMap[i][j] === 'P') {
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(j * 32, i * 32, 8, 8);
                 }
+            }
+        }
+    }
+
+    trackPac() {
+
+        let pacY = Math.floor(this.position.y / 32);
+        let pacX = Math.floor(this.position.x / 32);
+
+        for (let i = 0; i < 21; i++) {
+            for (let j = 0; j < 19; j++) {
+                if (tileMap[i][j] === 'P')
+                    tileMap[i][j] = ' ';
+                tileMap[pacY][pacX] = 'P';
             }
         }
     }
@@ -350,7 +385,8 @@ function drawAnimationLoop() {
     pacMap.drawBlocks();
     pacPellets.drawPellets();
     pacMan.updatePosition();
-    pacMan.eatPellet();
+    pacMan.trackPac();
+    pacMan.drawRed();
 
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${gameScore}`, 700, 100);
