@@ -215,7 +215,6 @@ class PacMan {
     checkRightPosition() {
         let nextX = Math.floor(pacMan.position.x / 32) + 1;
         let nextY = Math.floor(pacMan.position.y / 32);
-        console.log(pacMan.position.x, nextX)
 
 
         if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
@@ -228,9 +227,11 @@ class PacMan {
         let nextX = Math.floor((pacMan.position.x + pacMan.width - 1) / 32) - 1;
         let nextY = Math.floor(pacMan.position.y / 32);
 
-        console.log(pacMan.position.x, nextX)
+        // addition logic for starting x value
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
+        if ((nextX * 32 + pacMan.width !== pacMan.position.x))
+            return true;
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P')
             return true;
         else
             return false;
@@ -239,6 +240,8 @@ class PacMan {
     checkUpPosition() {
         let nextX = Math.floor((pacMan.position.x / 32));
         let nextY = Math.floor((pacMan.position.y / 32)) - 1;
+
+        // addition logic for starting y value
 
         if ((nextY * 32 + pacMan.height) !== pacMan.position.y)
             return true;
