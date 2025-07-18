@@ -1,9 +1,12 @@
 import { Block } from "./block.js";
-import { PacMap } from "./pac-map.js";
+import { PacMap, blockRow, blockColumn } from "./pac-map.js";
 import { Pellet } from "./pellet.js";
+import { Player } from "./player.js";
+import { Ghost } from "./ghosts.js";
 
 export const canvas = document.querySelector('canvas');
 export const ctx = canvas.getContext('2d');
+
 
 export let Blocks = [];
 export let Pellets = [];
@@ -19,7 +22,7 @@ export let tileMap = [
     "X XX X XXXXX X XX X",
     "X    X       X    X",
     "XXXX XXXX XXXX XXXX",
-    "OOOX X       X XOOO",
+    "OOOX X  rop  X XOOO",
     "XXXX X XX XX X XXXX",
     "X                 X",
     "XXXX X XXXXX X XXXX",
@@ -39,10 +42,8 @@ let gameScore = 0;
 
 tileMap = tileMap.map(substring => substring.split(''));
 
+class PacMan extends Player {
 
-class PacMan {
-    width = 32;
-    height = 32;
     position = {};
 
     keysDown = new Set();
@@ -60,7 +61,7 @@ class PacMan {
 
     constructor() {
         // Constructor finds coordinates of pac-man using findPac() fn and initalizes pac-man's position
-
+        super();
         let [x, y] = this.findPac();
         this.position.x = x * this.width;
         this.position.y = y * this.height;
@@ -69,8 +70,8 @@ class PacMan {
     findPac() {
         // Finds pac-man's position on the 2D array 'tileMap'
 
-        for (let i = 0; i < 21; i++) {
-            for (let j = 0; j < 19; j++) {
+        for (let i = 0; i < blockRow; i++) {
+            for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === 'P')
                     return [j, i];
             }
@@ -118,22 +119,22 @@ class PacMan {
 
         // Whichever direction is currently assigned to the 'currentKey' variable is used to move pac-man a distance 2.5px in the corresponding direction
 
-        if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition()) {
+        if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition(this.position.x, this.position.y)) {
             this.position.x -= 2;
             pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
             ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
-        else if (this.currentKey === 'ArrowRight' && this.checkRightPosition()) {
+        else if (this.currentKey === 'ArrowRight' && this.checkRightPosition(this.position.x, this.position.y)) {
             this.position.x += 2;
             pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
             ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
-        else if (this.currentKey === 'ArrowUp' && this.checkUpPosition()) {
+        else if (this.currentKey === 'ArrowUp' && this.checkUpPosition(this.position.x, this.position.y)) {
             this.position.y -= 2;
             pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
             ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
-        else if (this.currentKey === 'ArrowDown' && this.checkDownPosition()) {
+        else if (this.currentKey === 'ArrowDown' && this.checkDownPosition(this.position.x, this.position.y)) {
             pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
             this.position.y += 2;
             ctx.drawImage(this.imgDown, this.position.x, this.position.y);
@@ -156,70 +157,6 @@ class PacMan {
         return [Math.floor(pacMan.position.y / 32), Math.floor(pacMan.position.x / 32)];
     }
 
-    checkRightPosition() {
-        let nextX = Math.floor(pacMan.position.x / 32) + 1;
-        let nextY = Math.floor(pacMan.position.y / 32);
-
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
-            this.eatPellet(nextY, nextX);
-            return true;
-        }
-        else
-            return false;
-    }
-
-    checkLeftPosition() {
-        let nextX = Math.floor((pacMan.position.x + pacMan.width - 1) / 32) - 1;
-        let nextY = Math.floor(pacMan.position.y / 32);
-
-        // addition logic for starting x value
-
-        if ((nextX * 32 + pacMan.width !== pacMan.position.x)) {
-            this.eatPellet(nextY, nextX);
-            return true;
-        }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
-            this.eatPellet(nextY, nextX);
-            return true;
-
-        }
-        else
-            return false;
-    }
-
-    checkUpPosition() {
-        let nextX = Math.floor((pacMan.position.x / 32));
-        let nextY = Math.floor((pacMan.position.y / 32)) - 1;
-
-        // addition logic for starting y value
-
-        if ((nextY * 32 + pacMan.height) !== pacMan.position.y) {
-            this.eatPellet(nextY, nextX);
-            return true;
-        }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
-            this.eatPellet(nextY, nextX);
-            return true;
-        }
-        else
-            return false;
-    }
-
-    checkDownPosition() {
-        let nextX = Math.floor(pacMan.position.x / 32);
-        let nextY = Math.floor(pacMan.position.y / 32) + 1;
-
-
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P') {
-            this.eatPellet(nextY, nextX);
-            return true;
-
-        }
-        else
-            return false;
-    }
-
     checkQueuedPositions() {
 
         if (this.currentKey === this.queuedKey) {
@@ -228,10 +165,10 @@ class PacMan {
         }
 
 
-        if ((this.queuedKey === 'ArrowRight' && this.checkRightPosition())
-            || (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition())
-            || (this.queuedKey === 'ArrowUp' && this.checkUpPosition())
-            || (this.queuedKey === 'ArrowDown' && this.checkDownPosition())) {
+        if ((this.queuedKey === 'ArrowRight' && this.checkRightPosition(this.position.x, this.position.y))
+            || (this.queuedKey === 'ArrowLeft' && this.checkLeftPosition(this.position.x, this.position.y))
+            || (this.queuedKey === 'ArrowUp' && this.checkUpPosition(this.position.x, this.position.y))
+            || (this.queuedKey === 'ArrowDown' && this.checkDownPosition(this.position.x, this.position.y))) {
             this.currentKey = this.queuedKey;
             this.queuedKey = null
             return;
@@ -254,8 +191,8 @@ class PacMan {
     }
 
     drawRed() {
-        for (let i = 0; i < 21; i++) {
-            for (let j = 0; j < 19; j++) {
+        for (let i = 0; i < blockRow; i++) {
+            for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === 'P') {
                     ctx.fillStyle = 'red';
                     ctx.fillRect(j * 32, i * 32, 8, 8);
@@ -269,8 +206,8 @@ class PacMan {
         let pacY = Math.floor(this.position.y / 32);
         let pacX = Math.floor(this.position.x / 32);
 
-        for (let i = 0; i < 21; i++) {
-            for (let j = 0; j < 19; j++) {
+        for (let i = 0; i < blockRow; i++) {
+            for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === 'P')
                     tileMap[i][j] = ' ';
                 tileMap[pacY][pacX] = 'P';
@@ -298,6 +235,11 @@ let pacPellets = new Pellet({
     y: 1
 });
 
+let ghost = new Ghost({
+    x: 1,
+    y: 1
+});
+
 
 function drawAnimationLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -306,7 +248,7 @@ function drawAnimationLoop() {
     pacMan.updatePosition();
     pacMan.trackPac();
     pacMan.drawRed();
-
+    ghost.drawGhost();
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${gameScore}`, 700, 100);
 

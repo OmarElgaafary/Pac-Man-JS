@@ -2,10 +2,11 @@ import { Block } from "./block.js";
 import { Blocks, Pellets, tileMap } from "./pac-man.js"
 import { Pellet } from "./pellet.js";
 
+export const blockRow = 21;
+export const blockColumn = 19;
+
 
 export class PacMap extends Block {
-    blockRow = 21;
-    blockColumn = 19;
 
     constructor(position) {
         super(position);
@@ -17,8 +18,8 @@ export class PacMap extends Block {
         // Creates map boundries in the form of 'Blocks' by finding corresponding 'X' position representing map Block.
         // Fn then pushes the found Block to an array of map blocks (Blocks); 
 
-        for (let i = 0; i < this.blockRow; i++) {
-            for (let j = 0; j < this.blockColumn; j++) {
+        for (let i = 0; i < blockRow; i++) {
+            for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === 'X') {
                     Blocks.push(new Block({
                         x: j,
@@ -32,8 +33,8 @@ export class PacMap extends Block {
     createPellets() {
         // Creates pellets of class 'Pellet' for every ' ' found in the tileMap 2D array and stores it in Pellets array
 
-        for (let i = 0; i < this.blockRow; i++) {
-            for (let j = 0; j < this.blockColumn; j++) {
+        for (let i = 0; i < blockRow; i++) {
+            for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === ' ') {
                     Pellets.push(new Pellet({
                         x: j,
