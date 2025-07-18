@@ -2,7 +2,7 @@ import { Block } from "./block.js";
 import { PacMap, blockRow, blockColumn } from "./pac-map.js";
 import { Pellet } from "./pellet.js";
 import { Player } from "./player.js";
-import { Ghost } from "./ghosts.js";
+import { Ghost, redAvailablePositions, pinkAvailablePositions, orangeAvailablePositions } from "./ghosts.js";
 
 export const canvas = document.querySelector('canvas');
 export const ctx = canvas.getContext('2d');
@@ -59,9 +59,9 @@ class PacMan extends Player {
 
     lastKey = 'ArrowRight';
 
-    constructor() {
+    constructor(position) {
         // Constructor finds coordinates of pac-man using findPac() fn and initalizes pac-man's position
-        super();
+        super(position);
         let [x, y] = this.findPac();
         this.position.x = x * this.width;
         this.position.y = y * this.height;
@@ -141,10 +141,14 @@ class PacMan extends Player {
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
 
-        if (this.currentKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         else if (this.currentKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         else if (this.currentKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         else if (this.currentKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
+
+        // tracks current position of pac-man on the grid represented by the char 'P'
+
+        pacMan.trackPac();
 
         // Gray pac-man hitbox
 
@@ -215,6 +219,70 @@ class PacMan extends Player {
         }
     }
 
+    checkRightPosition(posX, posY) {
+        let nextX = Math.floor(posX / 32) + 1;
+        let nextY = Math.floor(posY / 32);
+
+
+        if (tileMap[nextY][nextX] === ' ') {
+            this.eatPellet(nextY, nextX);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    checkLeftPosition(posX, posY) {
+        let nextX = Math.floor((posX + this.width - 1) / 32) - 1;
+        let nextY = Math.floor(posY / 32);
+
+        // addition logic for starting x value
+
+        if ((nextX * 32 + this.width !== posX)) {
+            this.eatPellet(nextY, nextX);
+            return true;
+        }
+        else if (tileMap[nextY][nextX] === ' ') {
+            this.eatPellet(nextY, nextX);
+            return true;
+
+        }
+        else
+            return false;
+    }
+
+    checkUpPosition(posX, posY) {
+        let nextX = Math.floor((posX / 32));
+        let nextY = Math.floor((posY / 32)) - 1;
+
+        // addition logic for starting y value
+
+        if ((nextY * 32 + this.height) !== posY) {
+            this.eatPellet(nextY, nextX);
+            return true;
+        }
+        else if (tileMap[nextY][nextX] === ' ') {
+            this.eatPellet(nextY, nextX);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    checkDownPosition(posX, posY) {
+        let nextX = Math.floor(posX / 32);
+        let nextY = Math.floor(posY / 32) + 1;
+
+
+        if (tileMap[nextY][nextX] === ' ') {
+            this.eatPellet(nextY, nextX);
+            return true;
+
+        }
+        else
+            return false;
+    }
+
 };
 
 
@@ -235,10 +303,20 @@ let pacPellets = new Pellet({
     y: 1
 });
 
-let ghost = new Ghost({
-    x: 1,
-    y: 1
-});
+let redGhost = new Ghost({
+    x: 3,
+    y: 3
+}, 'r', redAvailablePositions);
+
+let pinkGhost = new Ghost({
+    x: 3,
+    y: 3
+}, 'p', pinkAvailablePositions);
+
+let orangeGhost = new Ghost({
+    x: 3,
+    y: 3
+}, 'o', orangeAvailablePositions);
 
 
 function drawAnimationLoop() {
@@ -246,9 +324,8 @@ function drawAnimationLoop() {
     pacMap.drawBlocks();
     pacPellets.drawPellets();
     pacMan.updatePosition();
-    pacMan.trackPac();
     pacMan.drawRed();
-    ghost.drawGhost();
+    redGhost.drawGhost();
     ctx.fillStyle = 'white';
     ctx.fillText(`Score: ${gameScore}`, 700, 100);
 
