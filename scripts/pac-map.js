@@ -49,7 +49,7 @@ export class PacMap extends Block {
 
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === ' ' || tileMap[i][j] === 'r' || tileMap[i][j] === 'o' || tileMap[i][j] === 'p') {
+                if (tileMap[i][j] === ' ' || tileMap[i][j] === 'r' || tileMap[i][j] === 'o' || tileMap[i][j] === 'p' || tileMap[i][j] === 'P') {
                     Pellets.push(new Pellet({
                         x: j,
                         y: i

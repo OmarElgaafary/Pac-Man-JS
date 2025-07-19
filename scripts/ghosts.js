@@ -37,7 +37,43 @@ export class Ghost extends Player {
 
         ctx.drawImage(this.ghostImage(), this.position.x, this.position.y);
     }
+    /*
+                        blockChar === '-' ||
+                        blockChar === '|' ||
+                        blockChar === ']' ||
+                        blockChar === '[' ||
+                        blockChar === 'T' ||
+                        blockChar === '_' ||
+                        blockChar === '<' ||
+                        blockChar === '>' ||
+                        blockChar === '{' ||
+                        blockChar === '}' ||
+                        blockChar === '~' ||
+                        blockChar === '^' ||
+                        blockChar === '(' ||
+                        blockChar === ')'
+    */
 
+    blockClear(posY, posX) {
+        if (tileMap[posY][posX] !== '-'
+            && tileMap[posY][posX] !== '|'
+            && tileMap[posY][posX] !== '['
+            && tileMap[posY][posX] !== ']'
+            && tileMap[posY][posX] !== 'T'
+            && tileMap[posY][posX] !== '_'
+            && tileMap[posY][posX] !== '<'
+            && tileMap[posY][posX] !== '>'
+            && tileMap[posY][posX] !== '{'
+            && tileMap[posY][posX] !== '}'
+            && tileMap[posY][posX] !== '~'
+            && tileMap[posY][posX] !== '^'
+            && tileMap[posY][posX] !== '('
+            && tileMap[posY][posX] !== ')')
+            return true
+        else
+            return false;
+
+    }
 
     updateAvailableDirections() {
         this.availableDirections = [];
@@ -45,16 +81,18 @@ export class Ghost extends Player {
         const currentGridX = Math.round(this.position.x / this.width);
         const currentGridY = Math.round(this.position.y / this.height);
 
-        if (currentGridX + 1 < blockColumn && tileMap[currentGridY][currentGridX + 1] !== 'X') {
+
+        if (currentGridX + 1 < blockColumn && this.blockClear(currentGridY, currentGridX + 1)) {
             this.availableDirections.push('ArrowRight');
         }
-        if (currentGridX - 1 >= 0 && tileMap[currentGridY][currentGridX - 1] !== 'X') {
+        if (currentGridX - 1 >= 0 && this.blockClear(currentGridY, currentGridX - 1)
+        ) {
             this.availableDirections.push('ArrowLeft');
         }
-        if (currentGridY - 1 >= 0 && tileMap[currentGridY - 1][currentGridX] !== 'X') {
+        if (currentGridY - 1 >= 0 && this.blockClear(currentGridY - 1, currentGridX)) {
             this.availableDirections.push('ArrowUp');
         }
-        if (currentGridY + 1 < blockRow && tileMap[currentGridY + 1][currentGridX] !== 'X') {
+        if (currentGridY + 1 < blockRow && this.blockClear(currentGridY + 1, currentGridX)) {
             this.availableDirections.push('ArrowDown');
         }
     }
