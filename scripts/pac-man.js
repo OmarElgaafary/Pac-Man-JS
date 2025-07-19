@@ -1,4 +1,3 @@
-import { Block } from "./block.js";
 import { PacMap, blockRow, blockColumn } from "./pac-map.js";
 import { Pellet } from "./pellet.js";
 import { Player } from "./player.js";
@@ -11,8 +10,9 @@ export const ctx = canvas.getContext('2d');
 export let Blocks = [];
 export let Pellets = [];
 
-canvas.height = innerHeight;
-canvas.width = innerWidth;
+canvas.height = blockRow * 32;
+canvas.width = blockColumn * 32;
+console.log(canvas.height, canvas.width)
 
 export let tileMap = [
     "XXXXXXXXXXXXXXXXXXX",
@@ -343,6 +343,7 @@ function drawAnimationLoop() {
         redGhost.trackGhost();
         pinkGhost.trackGhost();
         orangeGhost.trackGhost();
+        
         ctx.fillStyle = 'white';
         ctx.fillText(`Score: ${gameScore}`, 700, 100);
 

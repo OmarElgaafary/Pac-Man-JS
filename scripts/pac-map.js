@@ -35,7 +35,7 @@ export class PacMap extends Block {
 
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === ' ') {
+                if (tileMap[i][j] === ' ' || tileMap[i][j] === 'r' || tileMap[i][j] === 'o' || tileMap[i][j] === 'p') {
                     Pellets.push(new Pellet({
                         x: j,
                         y: i
