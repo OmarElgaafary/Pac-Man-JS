@@ -2,7 +2,7 @@ import { Block } from "./block.js";
 import { PacMap, blockRow, blockColumn } from "./pac-map.js";
 import { Pellet } from "./pellet.js";
 import { Player } from "./player.js";
-import { Ghost, redAvailablePositions, pinkAvailablePositions, orangeAvailablePositions } from "./ghosts.js";
+import { Ghost } from "./ghosts.js";
 
 export const canvas = document.querySelector('canvas');
 export const ctx = canvas.getContext('2d');
@@ -20,9 +20,9 @@ export let tileMap = [
     "X XX XXX X XXX XX X",
     "X                 X",
     "X XX X XXXXX X XX X",
-    "X    X       X    X",
+    "X    X  pro  X    X",
     "XXXX XXXX XXXX XXXX",
-    "OOOX X  rop  X XOOO",
+    "OOOX X       X XOOO",
     "XXXX X XX XX X XXXX",
     "X                 X",
     "XXXX X XXXXX X XXXX",
@@ -39,13 +39,14 @@ export let tileMap = [
 ];
 
 let gameScore = 0;
+let gameStatus = true;
+
 
 tileMap = tileMap.map(substring => substring.split(''));
 
 class PacMan extends Player {
 
     position = {};
-
     keysDown = new Set();
 
     currentKey = '';
@@ -55,7 +56,6 @@ class PacMan extends Player {
     imgLeft = document.getElementById('pac-left');
     imgUp = document.getElementById('pac-up');
     imgDown = document.getElementById('pac-down');
-    redDot = document.getElementById('red-dot');
 
     lastKey = 'ArrowRight';
 
@@ -81,7 +81,10 @@ class PacMan extends Player {
 
     drawPac() {
         // Draws pac-man
-        ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+        if (this.currentKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
+        else if (this.currentKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
     }
 
     checkKeys() {
@@ -122,29 +125,22 @@ class PacMan extends Player {
         if (this.currentKey === 'ArrowLeft' && this.checkLeftPosition(this.position.x, this.position.y)) {
             this.position.x -= 2;
             pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
-            ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowRight' && this.checkRightPosition(this.position.x, this.position.y)) {
             this.position.x += 2;
             pacMan.position.y = Math.floor(pacMan.position.y / 32) * 32;
-            ctx.drawImage(this.imgRight, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowUp' && this.checkUpPosition(this.position.x, this.position.y)) {
             this.position.y -= 2;
             pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
-            ctx.drawImage(this.imgUp, this.position.x, this.position.y);
         }
         else if (this.currentKey === 'ArrowDown' && this.checkDownPosition(this.position.x, this.position.y)) {
             pacMan.position.x = Math.floor(pacMan.position.x / 32) * 32;
             this.position.y += 2;
-            ctx.drawImage(this.imgDown, this.position.x, this.position.y);
         }
         // if no arrow keys are pressed, canvas will draw pac-man direction of the last key pressed
 
-        else if (this.currentKey === 'ArrowRight') ctx.drawImage(this.imgRight, this.position.x, this.position.y);
-        else if (this.currentKey === 'ArrowLeft') ctx.drawImage(this.imgLeft, this.position.x, this.position.y);
-        else if (this.currentKey === 'ArrowUp') ctx.drawImage(this.imgUp, this.position.x, this.position.y);
-        else if (this.currentKey === 'ArrowDown') ctx.drawImage(this.imgDown, this.position.x, this.position.y);
+
 
         // tracks current position of pac-man on the grid represented by the char 'P'
 
@@ -154,11 +150,6 @@ class PacMan extends Player {
 
         ctx.strokeStyle = "white";
         ctx.strokeRect(this.position.x * this.width, this.position.y * this.height, this.width, this.height);
-    }
-
-    convertPixelToGrid() {
-        // converts pacman's position in pixels to his [i, j] position's on the 'tileMap' grid
-        return [Math.floor(pacMan.position.y / 32), Math.floor(pacMan.position.x / 32)];
     }
 
     checkQueuedPositions() {
@@ -194,16 +185,16 @@ class PacMan extends Player {
 
     }
 
-    drawRed() {
-        for (let i = 0; i < blockRow; i++) {
-            for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === 'P') {
-                    ctx.fillStyle = 'red';
-                    ctx.fillRect(j * 32, i * 32, 8, 8);
-                }
-            }
-        }
-    }
+    // drawRed() {
+    //     for (let i = 0; i < blockRow; i++) {
+    //         for (let j = 0; j < blockColumn; j++) {
+    //             if (tileMap[i][j] === 'P') {
+    //                 ctx.fillStyle = 'red';
+    //                 ctx.fillRect(j * 32, i * 32, 8, 8);
+    //             }
+    //         }
+    //     }
+    // }
 
     trackPac() {
 
@@ -224,7 +215,7 @@ class PacMan extends Player {
         let nextY = Math.floor(posY / 32);
 
 
-        if (tileMap[nextY][nextX] === ' ') {
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
             this.eatPellet(nextY, nextX);
             return true;
         }
@@ -242,7 +233,7 @@ class PacMan extends Player {
             this.eatPellet(nextY, nextX);
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ') {
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
             this.eatPellet(nextY, nextX);
             return true;
 
@@ -261,7 +252,7 @@ class PacMan extends Player {
             this.eatPellet(nextY, nextX);
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ') {
+        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
             this.eatPellet(nextY, nextX);
             return true;
         }
@@ -274,7 +265,7 @@ class PacMan extends Player {
         let nextY = Math.floor(posY / 32) + 1;
 
 
-        if (tileMap[nextY][nextX] === ' ') {
+        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
             this.eatPellet(nextY, nextX);
             return true;
 
@@ -283,7 +274,16 @@ class PacMan extends Player {
             return false;
     }
 
+    getPacPosition() {
+        return this.position;
+    }
+
 };
+
+function isGameOver(pacPosition, ghostPosition) {
+    if (Math.floor(pacPosition.x / 32) === Math.floor(ghostPosition.x / 32) && Math.floor(pacPosition.y / 32) === Math.floor(ghostPosition.y / 32))
+        gameStatus = false
+}
 
 
 let pacMap = new PacMap({
@@ -306,30 +306,48 @@ let pacPellets = new Pellet({
 let redGhost = new Ghost({
     x: 3,
     y: 3
-}, 'r', redAvailablePositions);
-
-let pinkGhost = new Ghost({
-    x: 3,
-    y: 3
-}, 'p', pinkAvailablePositions);
+}, 'r');
 
 let orangeGhost = new Ghost({
     x: 3,
     y: 3
-}, 'o', orangeAvailablePositions);
+}, 'o');
+
+let pinkGhost = new Ghost({
+    x: 3,
+    y: 3
+}, 'p');
+
 
 
 function drawAnimationLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pacMap.drawBlocks();
-    pacPellets.drawPellets();
-    pacMan.updatePosition();
-    pacMan.drawRed();
-    redGhost.drawGhost();
-    ctx.fillStyle = 'white';
-    ctx.fillText(`Score: ${gameScore}`, 700, 100);
+    if (gameStatus) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pacMap.drawBlocks();
+        pacPellets.drawPellets();
+        pacMan.updatePosition();
+        redGhost.ghostMovement();
+        orangeGhost.ghostMovement();
+        pinkGhost.ghostMovement();
 
-    requestAnimationFrame(drawAnimationLoop);
+        pacMan.drawPac();
+        redGhost.drawGhost();
+        orangeGhost.drawGhost();
+        pinkGhost.drawGhost();
+
+
+        isGameOver(pacMan.getPacPosition(), redGhost.getGhostPosition());
+        isGameOver(pacMan.getPacPosition(), pinkGhost.getGhostPosition());
+        isGameOver(pacMan.getPacPosition(), orangeGhost.getGhostPosition());
+
+        redGhost.trackGhost();
+        pinkGhost.trackGhost();
+        orangeGhost.trackGhost();
+        ctx.fillStyle = 'white';
+        ctx.fillText(`Score: ${gameScore}`, 700, 100);
+
+        requestAnimationFrame(drawAnimationLoop);
+    }
 }
 
 drawAnimationLoop();

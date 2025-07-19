@@ -2,77 +2,142 @@ import { ctx, tileMap } from "./pac-man.js";
 import { blockColumn, blockRow } from "./pac-map.js";
 import { Player } from "./player.js";
 
-export const redAvailablePositions = new Set();
-export const orangeAvailablePositions = new Set();
-export const pinkAvailablePositions = new Set();
-
 export class Ghost extends Player {
     redGhostImg = document.getElementById('red-ghost');
     pinkGhostImg = document.getElementById('pink-ghost');
     orangeGhostImg = document.getElementById('orange-ghost');
 
+    ghostChar;
+    currentDirection = 'ArrowLeft';
 
+    availableDirections = [];
+    oppositeDirection = null;
 
-
-    constructor(position, ghostChar, ghostAvailablePositions) {
+    constructor(position, ghostChar) {
         super(position);
         this.findGhost(ghostChar);
-        this.drawGhost();
-        this.checkGhostPositions(ghostAvailablePositions);
-        console.log(ghostChar, ghostAvailablePositions);
+        this.updateAvailableDirections();
+        this.ghostChar = ghostChar;
     }
 
     findGhost(ghostChar) {
-
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
                 if (tileMap[i][j] === ghostChar) {
                     this.position.x = j * this.width;
                     this.position.y = i * this.height;
                     console.log(this.position);
+                    return;
                 }
             }
         }
-
     }
 
     drawGhost() {
+
+        ctx.drawImage(this.ghostImage(), this.position.x, this.position.y);
+    }
+
+
+    updateAvailableDirections() {
+        this.availableDirections = [];
+
+        const currentGridX = Math.round(this.position.x / this.width);
+        const currentGridY = Math.round(this.position.y / this.height);
+
+        if (currentGridX + 1 < blockColumn && tileMap[currentGridY][currentGridX + 1] !== 'X') {
+            this.availableDirections.push('ArrowRight');
+        }
+        if (currentGridX - 1 >= 0 && tileMap[currentGridY][currentGridX - 1] !== 'X') {
+            this.availableDirections.push('ArrowLeft');
+        }
+        if (currentGridY - 1 >= 0 && tileMap[currentGridY - 1][currentGridX] !== 'X') {
+            this.availableDirections.push('ArrowUp');
+        }
+        if (currentGridY + 1 < blockRow && tileMap[currentGridY + 1][currentGridX] !== 'X') {
+            this.availableDirections.push('ArrowDown');
+        }
+    }
+
+    ghostImage() {
+        switch (this.ghostChar) {
+            case 'r':
+                return this.redGhostImg;
+            case 'o':
+                return this.orangeGhostImg;
+            case 'p':
+                return this.pinkGhostImg;
+            default:
+                return this.redGhostImg;
+        }
+    }
+
+    getOppositeDirection(direction) {
+        switch (direction) {
+            case 'ArrowUp': return 'ArrowDown';
+            case 'ArrowDown': return 'ArrowUp';
+            case 'ArrowLeft': return 'ArrowRight';
+            case 'ArrowRight': return 'ArrowLeft';
+            default: return null;
+        }
+    }
+
+    trackGhost() {
+
+        let ghostY = Math.floor(this.position.y / 32);
+        let ghostX = Math.floor(this.position.x / 32);
+
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === 'r') {
-                    ctx.drawImage(this.redGhostImg, j * this.width, i * this.height);
-                }
-                else if (tileMap[i][j] === 'o') {
-                    ctx.drawImage(this.orangeGhostImg, j * this.width, i * this.height);
-                }
-                else if (tileMap[i][j] === 'p') {
-                    ctx.drawImage(this.pinkGhostImg, j * this.width, i * this.height);
-                }
-
+                if (tileMap[i][j] === `${this.ghostChar}`)
+                    tileMap[i][j] = ' ';
+                tileMap[ghostY][ghostX] = `${this.ghostChar}`;
             }
         }
     }
 
-    checkGhostPositions(ghostAvailablePositions) {
-        if (this.checkRightPosition(this.position.x, this.position.y) && !ghostAvailablePositions.has('ArrowRight'))
-            ghostAvailablePositions.add('ArrowRight');
-        else if (!this.checkRightPosition(this.position.x, this.position.y) && ghostAvailablePositions.has('ArrowRight'))
-            ghostAvailablePositions.delete('ArrowRight')
-
-        if (this.checkLeftPosition(this.position.x, this.position.y) && !ghostAvailablePositions.has('ArrowLeft'))
-            ghostAvailablePositions.add('ArrowLeft');
-        else if (!this.checkLeftPosition(this.position.x, this.position.y) && ghostAvailablePositions.has('ArrowLeft'))
-            ghostAvailablePositions.delete('ArrowLeft')
-
-        if (this.checkUpPosition(this.position.x, this.position.y) && !ghostAvailablePositions.has('ArrowUp'))
-            ghostAvailablePositions.add('ArrowUp');
-        else if (!this.checkUpPosition(this.position.x, this.position.y) && ghostAvailablePositions.has('ArrowUp'))
-            ghostAvailablePositions.delete('ArrowUp')
-
-        if (this.checkDownPosition(this.position.x, this.position.y) && !ghostAvailablePositions.has('ArrowDown'))
-            ghostAvailablePositions.add('ArrowDown');
-        else if (!this.checkDownPosition(this.position.x, this.position.y) && ghostAvailablePositions.has('ArrowDown'))
-            ghostAvailablePositions.delete('ArrowDown')
+    getGhostPosition() {
+        return this.position;
     }
 
-};
+    ghostMovement() {
+        const speed = 2;
+
+        if (this.position.x % this.width === 0 && this.position.y % this.height === 0) {
+            this.updateAvailableDirections();
+
+            let possibleDirections = this.availableDirections.filter(
+                dir => dir !== this.oppositeDirection
+            );
+
+            if (possibleDirections.length === 0 && this.availableDirections.includes(this.oppositeDirection)) {
+                possibleDirections = this.oppositeDirection;
+            } else if (possibleDirections.length === 0) {
+                return;
+            }
+
+
+            const randIndex = Math.floor(Math.random() * possibleDirections.length);
+            const randDirection = possibleDirections[randIndex];
+
+            this.currentDirection = randDirection;
+            this.oppositeDirection = this.getOppositeDirection(this.currentDirection);
+        }
+
+        if (this.currentDirection === 'ArrowLeft') {
+            this.position.x -= speed;
+            this.position.y = Math.round(this.position.y / this.height) * this.height; // Align Y
+        } else if (this.currentDirection === 'ArrowRight') {
+            this.position.x += speed;
+            this.position.y = Math.round(this.position.y / this.height) * this.height; // Align Y
+        } else if (this.currentDirection === 'ArrowUp') {
+            this.position.y -= speed;
+            this.position.x = Math.round(this.position.x / this.width) * this.width; // Align X
+        } else if (this.currentDirection === 'ArrowDown') {
+            this.position.y += speed;
+            this.position.x = Math.round(this.position.x / this.width) * this.width; // Align X
+        }
+
+        ctx.drawImage(this.ghostImage(), this.position.x, this.position.y);
+    }
+}
