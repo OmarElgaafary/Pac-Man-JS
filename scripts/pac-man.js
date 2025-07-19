@@ -15,27 +15,27 @@ canvas.width = blockColumn * 32;
 console.log(canvas.height, canvas.width)
 
 export let tileMap = [
-    "XXXXXXXXXXXXXXXXXXX",
-    "X        X        X",
-    "X XX XXX X XXX XX X",
-    "X                 X",
-    "X XX X XXXXX X XX X",
-    "X    X  pro  X    X",
-    "XXXX XXXX XXXX XXXX",
-    "OOOX X       X XOOO",
-    "XXXX X XX XX X XXXX",
-    "X                 X",
-    "XXXX X XXXXX X XXXX",
-    "OOOX X       X XOOO",
-    "XXXX X XXXXX X XXXX",
-    "X        X        X",
-    "X XX XXX X XXX XX X",
-    "X  X     P     X  X",
-    "XX X X XXXXX X X XX",
-    "X    X   X   X    X",
-    "X XXXXXX X XXXXXX X",
-    "X                 X",
-    "XXXXXXXXXXXXXXXXXXX"
+    "<--------^-------->",
+    "|        |        |",
+    "| [] [-] _ [-] [] |",
+    "|                 |",
+    "| [] T [---] T [] |",
+    "|    |       |    |",
+    "{--> (--] [--) <--}",
+    "OOO| |       | |OOO",
+    "<--} _ [---] _ {-->",
+    "|       orp       |",
+    "{--> T [---] T <--}",
+    "OOO| |       | |OOO",
+    "<--} _ [-^-] _ {-->",
+    "|        |        |",
+    "| [> [-] _ [-] <] |",
+    "|  |     P     |  |",
+    "(] _ T [-^-] T _ [)",
+    "|    |   |   |    |",
+    "| [--~-] _ [-~--] |",
+    "|                 |",
+    "{-----------------}"
 ];
 
 let gameScore = 0;
@@ -343,7 +343,7 @@ function drawAnimationLoop() {
         redGhost.trackGhost();
         pinkGhost.trackGhost();
         orangeGhost.trackGhost();
-        
+
         ctx.fillStyle = 'white';
         ctx.fillText(`Score: ${gameScore}`, 700, 100);
 

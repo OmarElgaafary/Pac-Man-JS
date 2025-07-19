@@ -20,11 +20,25 @@ export class PacMap extends Block {
 
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === 'X') {
+                const blockChar = tileMap[i][j];
+                if (blockChar === '-' ||
+                    blockChar === '|' ||
+                    blockChar === ']' ||
+                    blockChar === '[' ||
+                    blockChar === 'T' ||
+                    blockChar === '_' ||
+                    blockChar === '<' ||
+                    blockChar === '>' ||
+                    blockChar === '{' ||
+                    blockChar === '}' ||
+                    blockChar === '~' ||
+                    blockChar === '^' ||
+                    blockChar === '(' ||
+                    blockChar === ')') {
                     Blocks.push(new Block({
                         x: j,
                         y: i
-                    }));
+                    }, blockChar));
                 }
             }
         }
