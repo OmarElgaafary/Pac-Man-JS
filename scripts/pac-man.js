@@ -10,9 +10,10 @@ export const ctx = canvas.getContext('2d');
 export let Blocks = [];
 export let Pellets = [];
 
+const scoreBoard = document.querySelector('.score');
+
 canvas.height = blockRow * 32;
 canvas.width = blockColumn * 32;
-console.log(canvas.height, canvas.width)
 
 export let tileMap = [
     "<--------^-------->",
@@ -178,23 +179,12 @@ class PacMan extends Player {
             const pellet = Pellets[i];
             if (pellet.position.x === pacX && pellet.position.y === pacY) {
                 Pellets = Pellets.filter(p => p !== pellet)
-                gameScore += 5;
+                gameScore += 10;
                 return;
             }
         }
 
     }
-
-    // drawRed() {
-    //     for (let i = 0; i < blockRow; i++) {
-    //         for (let j = 0; j < blockColumn; j++) {
-    //             if (tileMap[i][j] === 'P') {
-    //                 ctx.fillStyle = 'red';
-    //                 ctx.fillRect(j * 32, i * 32, 8, 8);
-    //             }
-    //         }
-    //     }
-    // }
 
     trackPac() {
 
@@ -344,8 +334,8 @@ function drawAnimationLoop() {
         pinkGhost.trackGhost();
         orangeGhost.trackGhost();
 
-        ctx.fillStyle = 'white';
-        ctx.fillText(`Score: ${gameScore}`, 700, 100);
+
+        scoreBoard.innerHTML = `High Score: ${gameScore}`;
 
         requestAnimationFrame(drawAnimationLoop);
     }

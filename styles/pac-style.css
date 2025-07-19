@@ -22,8 +22,22 @@ canvas {
     transform: translate(-50%, -50%);
 }
 
-.pac-images
-{
+.pac-images {
     position: absolute;
     top: 100%;
+}
+
+.score-board {
+    position: absolute;
+    left: 50%;
+    top: 50px;
+    transform: translate(-50%, -50%);
+
+}
+
+.score {
+    color: white;
+    font-size: 30px;
+    font-family: "Press Start 2P", system-ui;
+    ;
 }
