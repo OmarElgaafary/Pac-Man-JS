@@ -11,6 +11,7 @@ export let Blocks = [];
 export let Pellets = [];
 
 const scoreBoard = document.querySelector('.score');
+const eatFruitScore = document.querySelector('.fruitScore');
 
 canvas.height = blockRow * 32;
 canvas.width = blockColumn * 32;
@@ -23,12 +24,12 @@ export let tileMap = [
     "| [] T [---] T [] |",
     "|    |       |    |",
     "{--> (--] [--) <--}",
-    "OOO| |       | |OOO",
-    "<--} _ [---] _ {-->",
-    "|       orp       |",
-    "{--> T [---] T <--}",
-    "OOO| |       | |OOO",
-    "<--} _ [-^-] _ {-->",
+    "OOO| |OOOOOOO| |OOO",
+    "<--} _O[---]O_ {-->",
+    "|    OOOorpOOO    |",
+    "{--> TO[---]OT <--}",
+    "OOO| |OOOfOOO| |OOO",
+    "<--} _O[-^-]O_ {-->",
     "|        |        |",
     "| [> [-] _ [-] <] |",
     "|  |     P     |  |",
@@ -40,7 +41,7 @@ export let tileMap = [
 ];
 
 let gameScore = 0;
-let gameStatus = true;
+let gameStatus = false;
 
 
 tileMap = tileMap.map(substring => substring.split(''));
@@ -100,6 +101,7 @@ class PacMan extends Player {
 
                 if (this.currentKey === '') {
                     this.currentKey = e.key;
+                    gameStatus = true;
                 }
                 else {
                     this.queuedKey = e.key;
@@ -113,7 +115,6 @@ class PacMan extends Player {
 
         // calls checkKeys() to update active keys
 
-        this.checkKeys();
 
         // checkQueuedPositions() goes through all 4 directions and determines if a queued direction's next block is available and reasigns current key if available
 
@@ -205,7 +206,13 @@ class PacMan extends Player {
         let nextY = Math.floor(posY / 32);
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f' ||
+            tileMap[nextY][nextX] === 'O') {
             this.eatPellet(nextY, nextX);
             return true;
         }
@@ -223,7 +230,13 @@ class PacMan extends Player {
             this.eatPellet(nextY, nextX);
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        else if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f' ||
+            tileMap[nextY][nextX] === 'O') {
             this.eatPellet(nextY, nextX);
             return true;
 
@@ -242,7 +255,13 @@ class PacMan extends Player {
             this.eatPellet(nextY, nextX);
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        else if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f' ||
+            tileMap[nextY][nextX] === 'O') {
             this.eatPellet(nextY, nextX);
             return true;
         }
@@ -255,7 +274,13 @@ class PacMan extends Player {
         let nextY = Math.floor(posY / 32) + 1;
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f' ||
+            tileMap[nextY][nextX] === 'O') {
             this.eatPellet(nextY, nextX);
             return true;
 
@@ -268,11 +293,38 @@ class PacMan extends Player {
         return this.position;
     }
 
+
 };
 
 function isGameOver(pacPosition, ghostPosition) {
-    if (Math.floor(pacPosition.x / 32) === Math.floor(ghostPosition.x / 32) && Math.floor(pacPosition.y / 32) === Math.floor(ghostPosition.y / 32))
-        gameStatus = false
+    if (Math.floor(pacPosition.x / 32) === Math.floor(ghostPosition.x / 32) && Math.floor(pacPosition.y / 32) === Math.floor(ghostPosition.y / 32)) {
+        gameStatus = false;
+        ctx.fillStyle = 'Red';
+        ctx.font = '28px "Press Start 2P", system-ui';
+        ctx.fillText('Game Over', 6 * pacMan.width, 10 * pacMan.height);
+
+    }
+    else if (Pellets.length === 0) {
+        gameStatus = false;
+        ctx.fillStyle = 'Green';
+        ctx.font = '28px "Press Start 2P", system-ui';
+        ctx.fillText('You win!', 6 * pacMan.width, 10 * pacMan.height);
+    }
+}
+let timeRunning = true;
+function eatFruit(pacPosition, fruit) {
+    if (Math.floor(pacPosition.x / 32) === fruit.x && Math.floor(pacPosition.y / 32) === fruit.y && fruit.status !== false) {
+        fruit.name = '';
+        fruit.status = false;
+        gameScore += 100;
+    }
+    else if (!fruit.status && timeRunning) {
+        eatFruitScore.innerHTML = '100!';
+        setTimeout(() => {
+            eatFruitScore.innerHTML = '';
+            timeRunning = false
+        }, 1000);
+    }
 }
 
 
@@ -311,34 +363,41 @@ let pinkGhost = new Ghost({
 
 
 function drawAnimationLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pacMap.drawBlocks();
+    pacPellets.drawPellets();
+    pacPellets.drawFruit(pacMap.fruit);
+    pacMan.drawPac();
+    eatFruit(pacMan.position, pacMap.fruit);
+    redGhost.drawGhost();
+    orangeGhost.drawGhost();
+    pinkGhost.drawGhost();
+
+    pacMan.checkKeys();
+    console.log(pacMap.fruit.name)
+
     if (gameStatus) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pacMap.drawBlocks();
-        pacPellets.drawPellets();
         pacMan.updatePosition();
         redGhost.ghostMovement();
         orangeGhost.ghostMovement();
         pinkGhost.ghostMovement();
-
-        pacMan.drawPac();
-        redGhost.drawGhost();
-        orangeGhost.drawGhost();
-        pinkGhost.drawGhost();
-
-
-        isGameOver(pacMan.getPacPosition(), redGhost.getGhostPosition());
-        isGameOver(pacMan.getPacPosition(), pinkGhost.getGhostPosition());
-        isGameOver(pacMan.getPacPosition(), orangeGhost.getGhostPosition());
-
-        redGhost.trackGhost();
-        pinkGhost.trackGhost();
-        orangeGhost.trackGhost();
-
-
-        scoreBoard.innerHTML = `High Score: ${gameScore}`;
-
-        requestAnimationFrame(drawAnimationLoop);
     }
+
+
+
+    isGameOver(pacMan.getPacPosition(), redGhost.getGhostPosition());
+    isGameOver(pacMan.getPacPosition(), pinkGhost.getGhostPosition());
+    isGameOver(pacMan.getPacPosition(), orangeGhost.getGhostPosition());
+
+    redGhost.trackGhost();
+    pinkGhost.trackGhost();
+    orangeGhost.trackGhost();
+
+
+    scoreBoard.innerHTML = `High Score: ${gameScore}`;
+
+    requestAnimationFrame(drawAnimationLoop);
+
 }
 
 drawAnimationLoop();

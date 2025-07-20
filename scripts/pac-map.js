@@ -6,7 +6,9 @@ export const blockRow = 21;
 export const blockColumn = 19;
 
 
+
 export class PacMap extends Block {
+    fruit;
 
     constructor(position) {
         super(position);
@@ -49,11 +51,41 @@ export class PacMap extends Block {
 
         for (let i = 0; i < blockRow; i++) {
             for (let j = 0; j < blockColumn; j++) {
-                if (tileMap[i][j] === ' ' || tileMap[i][j] === 'r' || tileMap[i][j] === 'o' || tileMap[i][j] === 'p' || tileMap[i][j] === 'P') {
+                if (tileMap[i][j] === ' ' || tileMap[i][j] === 'P') {
                     Pellets.push(new Pellet({
                         x: j,
                         y: i
                     }));
+                }
+                else if (tileMap[i][j] === 'f') {
+                    const randNum = String(Math.floor((Math.random() * 3)) + 1);
+                    console.log(randNum)
+                    switch (randNum) {
+                        case '1':
+                            this.fruit = {
+                                name: 'strawberry',
+                                x: j,
+                                y: i,
+                                status: true
+                            }
+                            break;
+                        case '2':
+                            this.fruit = {
+                                name: 'cherry',
+                                x: j,
+                                y: i,
+                                status: true
+                            }
+                            break;
+                        case '3':
+                            this.fruit = {
+                                name: 'apple',
+                                x: j,
+                                y: i,
+                                status: true
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -75,5 +107,6 @@ export class PacMap extends Block {
         }
 
     }
+
 
 };

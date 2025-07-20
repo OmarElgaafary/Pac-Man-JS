@@ -21,7 +21,12 @@ export class Player {
         let nextY = Math.floor(posY / 32);
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f') {
             return true;
         }
         else
@@ -37,7 +42,12 @@ export class Player {
         if ((nextX * 32 + this.width !== posX)) {
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        else if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f') {
             return true;
 
         }
@@ -54,7 +64,12 @@ export class Player {
         if ((nextY * 32 + this.height) !== posY) {
             return true;
         }
-        else if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        else if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f') {
             return true;
         }
         else
@@ -66,7 +81,12 @@ export class Player {
         let nextY = Math.floor(posY / 32) + 1;
 
 
-        if (tileMap[nextY][nextX] === ' ' || tileMap[nextY][nextX] === 'P' || tileMap[nextY][nextX] === 'r' || tileMap[nextY][nextX] === 'o' || tileMap[nextY][nextX] === 'p') {
+        if (tileMap[nextY][nextX] === ' ' ||
+            tileMap[nextY][nextX] === 'P' ||
+            tileMap[nextY][nextX] === 'r' ||
+            tileMap[nextY][nextX] === 'o' ||
+            tileMap[nextY][nextX] === 'p' ||
+            tileMap[nextY][nextX] === 'f') {
             return true;
 
         }

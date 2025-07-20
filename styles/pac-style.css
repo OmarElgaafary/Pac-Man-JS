@@ -41,3 +41,14 @@ canvas {
     font-family: "Press Start 2P", system-ui;
     ;
 }
+
+.fruitScore
+{
+    position: relative;
+    top: 480px;
+    color: pink;
+    left: 600px;
+    font-family: "Press Start 2P", system-ui;
+    font-size: larger;
+
+}

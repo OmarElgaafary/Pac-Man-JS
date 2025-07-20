@@ -68,7 +68,8 @@ export class Ghost extends Player {
             && tileMap[posY][posX] !== '~'
             && tileMap[posY][posX] !== '^'
             && tileMap[posY][posX] !== '('
-            && tileMap[posY][posX] !== ')')
+            && tileMap[posY][posX] !== ')'
+            && tileMap[posY][posX] !== 'f')
             return true
         else
             return false;
