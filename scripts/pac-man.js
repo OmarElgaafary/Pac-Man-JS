@@ -374,7 +374,6 @@ function drawAnimationLoop() {
     pinkGhost.drawGhost();
 
     pacMan.checkKeys();
-    console.log(pacMap.fruit.name)
 
     if (gameStatus) {
         pacMan.updatePosition();
